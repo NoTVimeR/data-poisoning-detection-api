@@ -78,10 +78,10 @@ Performs full multi-method analysis.
 The system is deployed as a cloud-based service using Render:
 
 👉 **Live API:**
-https://YOUR-URL.onrender.com
+https://data-poisoning-detection-api.onrender.com
 
 👉 **Swagger UI:**
-https://YOUR-URL.onrender.com/docs
+https://data-poisoning-detection-api.onrender.com/docs#/
 
 ---
 
