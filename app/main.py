@@ -1,43 +1,105 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import List
-from app.models.detector import PoisoningDetector
+from fastapi import FastAPI, HTTPException
+from app.schemas import (
+    AnalyzeRequest,
+    CleanRequest,
+    LabelAnalyzeRequest,
+    HealthResponse,
+    AnalyzeResponse,
+    CleanResponse,
+    LabelAnalyzeResponse,
+)
+from app.detector import DetectorService
 
 app = FastAPI(
-    title="AI Data Poisoning Detection System",
-    description="Simple prototype for pre-defense demo",
+    title="AI Data Poisoning Detection System v2",
+    description="Multi-method API for detecting and preventing data poisoning attacks in ML pipelines",
+    version="2.0.0",
 )
 
-detector = PoisoningDetector()
+detector = DetectorService()
 
-class DataInput(BaseModel):
-    values: List[float]
 
-@app.post("/detect")
-def detect(data: DataInput):
-    detector.fit(data.values)
-
-    results = detector.detect(data.values)
-
-    total = len(results)
-    anomalies = sum(1 for r in results if r["is_suspicious"])
-
+@app.get("/", tags=["General"])
+def root():
     return {
-        "results": results,
-        "summary": {
-            "total_samples": total,
-            "anomalies_detected": anomalies,
-            "anomaly_ratio": anomalies / total if total > 0 else 0
-        }
+        "message": "AI Data Poisoning Detection System v2 is running",
+        "docs": "/docs"
     }
 
-@app.post("/clean")
-def clean(data: DataInput):
-    results = detector.detect(data.values)
 
-    clean_data = [r["value"] for r in results if not r["is_suspicious"]]
-
+@app.get("/health", response_model=HealthResponse, tags=["General"])
+def health():
     return {
-        "clean_data": clean_data,
-        "removed_samples": len(data.values) - len(clean_data)
+        "status": "ok",
+        "service": "AI Data Poisoning Detection System v2"
     }
+
+
+@app.get("/methods", tags=["General"])
+def methods():
+    return {
+        "methods": [
+            {
+                "name": "z_score",
+                "purpose": "Detects obvious outliers using statistical deviation"
+            },
+            {
+                "name": "isolation_forest",
+                "purpose": "Detects subtle anomalies using an ensemble-based ML method"
+            },
+            {
+                "name": "lof",
+                "purpose": "Detects local density anomalies"
+            },
+            {
+                "name": "hybrid",
+                "purpose": "Combines multiple detectors using majority voting"
+            },
+            {
+                "name": "knn_label_consistency",
+                "purpose": "Detects label flipping by checking local label consistency"
+            }
+        ]
+    }
+
+
+@app.post("/analyze", response_model=AnalyzeResponse, tags=["Numeric Analysis"])
+def analyze(request: AnalyzeRequest):
+    try:
+        return detector.analyze_numeric(
+            values=request.values,
+            methods=request.methods,
+            z_threshold=request.z_threshold,
+            contamination=request.contamination,
+            n_estimators=request.n_estimators,
+            lof_neighbors=request.lof_neighbors,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/clean", response_model=CleanResponse, tags=["Numeric Analysis"])
+def clean(request: CleanRequest):
+    try:
+        return detector.clean_numeric(
+            values=request.values,
+            methods=request.methods,
+            z_threshold=request.z_threshold,
+            contamination=request.contamination,
+            n_estimators=request.n_estimators,
+            lof_neighbors=request.lof_neighbors,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.post("/analyze/labels", response_model=LabelAnalyzeResponse, tags=["Label Analysis"])
+def analyze_labels(request: LabelAnalyzeRequest):
+    try:
+        return detector.analyze_labels(
+            values=request.values,
+            labels=request.labels,
+            k_neighbors=request.k_neighbors,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
