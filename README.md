@@ -1,139 +1,79 @@
-# 🛡️ AI Data Poisoning Detection System
+# AI Data Poisoning Detection System v2.1
 
-## 📌 Overview
+FastAPI-based prototype for detecting data poisoning attacks before data is used in machine learning pipelines.
 
-This project presents a system for detecting and preventing data poisoning attacks in machine learning models.
-The system is implemented as a FastAPI-based web service that analyzes incoming data and identifies suspicious samples before they are used in ML pipelines.
+## Practical Improvements
 
----
+- Real-world validation with the Breast Cancer Wisconsin dataset.
+- Simple outlier, complex subtle poisoning, and label flipping attack simulation.
+- Improved complex subtle poisoning scenario using feature shift and correlation drift.
+- API v2.1 demo endpoints for end-to-end validation.
+- Minimal deep learning poisoning experiment using the Scikit-learn Digits dataset and an MLP classifier.
+- Architecture diagram for the diploma text and presentation.
 
-## 🎯 Project Goal
+## Detection Methods
 
-To develop a modular detection system that improves the reliability and security of AI models by filtering potentially poisoned data.
+| Method | Purpose |
+| --- | --- |
+| Z-score | Detects statistically obvious outliers |
+| Isolation Forest | Detects anomaly patterns using ensemble-based isolation |
+| Local Outlier Factor | Detects local density anomalies |
+| KNN Label Consistency | Detects label flipping through neighborhood label mismatch |
+| Hybrid | Combines detector outputs through voting |
 
----
+## API Endpoints
 
-## ⚙️ Key Features
+- `GET /health` - service status.
+- `GET /methods` - supported detection methods.
+- `POST /analyze` - multi-method numeric anomaly analysis.
+- `POST /clean` - removes suspicious samples and returns cleaned data.
+- `POST /analyze/labels` - label flipping detection with KNN consistency.
+- `GET /demo/end-to-end` - real dataset -> poisoning -> API detection -> cleaned data.
+- `GET /demo/real-dataset-results` - quantitative results for real-world dataset scenarios.
 
-* Multi-method anomaly detection:
+## Run Locally
 
-  * Z-score (statistical detection)
-  * Isolation Forest (machine learning-based)
-  * Local Outlier Factor (density-based)
-  * KNN Label Consistency (for label flipping attacks)
-* Hybrid detection approach
-* REST API (FastAPI)
-* Data cleaning functionality
-* Real-time analysis via HTTP requests
-
----
-
-## 🧠 Detection Methods
-
-| Method                | Purpose                         |
-| --------------------- | ------------------------------- |
-| Z-score               | Detects obvious outliers        |
-| Isolation Forest      | Detects subtle anomalies        |
-| LOF                   | Detects density-based anomalies |
-| KNN Label Consistency | Detects label flipping attacks  |
-| Hybrid                | Combines multiple methods       |
-
----
-
-## 🔬 Experiments
-
-We evaluated the system on different types of attacks:
-
-* Simple Outlier Attack
-* Complex Subtle Poisoning
-* Label Flipping Attack
-
-### Key Findings:
-
-* Z-score performs best for simple outliers
-* Isolation Forest is effective for subtle attacks
-* KNN method detects label manipulation
-* No single method is sufficient for all attack types
-
----
-
-## 🌐 API Endpoints
-
-### `POST /detect`
-
-Detects anomalies in input data.
-
-### `POST /clean`
-
-Removes suspicious samples and returns cleaned data.
-
-### `POST /analyze`
-
-Performs full multi-method analysis.
-
----
-
-## 🚀 Deployment
-
-The system is deployed as a cloud-based service using Render:
-
-👉 **Live API:**
-https://data-poisoning-detection-api.onrender.com
-
-👉 **Swagger UI:**
-https://data-poisoning-detection-api.onrender.com/docs#/
-
----
-
-## 🔌 Example Usage
-
-```python
-import requests
-
-data = {
-    "values": [45, 50, 120]
-}
-
-response = requests.post(
-    "https://YOUR-URL.onrender.com/analyze",
-    json=data
-)
-
-print(response.json())
+```powershell
+cd C:\pycharm\Diploma
+.\.venv\Scripts\activate
+uvicorn app.main:app --reload
 ```
 
----
+Swagger UI:
 
-## 🏗️ System Architecture
-
-The system acts as a middleware between data and machine learning models:
-
-```
-Data → API → Detection → Clean Data → ML Model
+```text
+http://127.0.0.1:8000/docs
 ```
 
----
+## Run Experiments
 
-## 📊 Technologies Used
+```powershell
+cd C:\pycharm\Diploma
+.\.venv\Scripts\python.exe experiments\run_real_dataset_experiment.py
+.\.venv\Scripts\python.exe experiments\run_threshold_tuning.py
+.\.venv\Scripts\python.exe experiments\run_deep_learning_poisoning.py
+```
 
-* Python
-* FastAPI
-* Scikit-learn
-* NumPy / Pandas
-* Matplotlib
+Generated result files:
 
----
+- `real_dataset_results.csv`
+- `complex_subtle_threshold_tuning.csv`
+- `deep_learning_poisoning_results.csv`
 
-## 🔮 Future Work
+## Architecture
 
-* Integration with real-world datasets (MNIST, CIFAR)
-* Real-time monitoring dashboard
-* Advanced ensemble detection methods
-* Cloud scaling and optimization
+See:
 
----
+- `docs/architecture.md`
 
-## 📚 Authors
+Short flow:
 
-Adal & Ainur
-Astana IT University
+```text
+Data Sources -> Poisoning Simulation -> FastAPI Detection Service
+-> Preprocessing -> Detection Layer -> Hybrid Decision Engine
+-> Suspicious Indices / Cleaned Data -> Downstream ML Pipeline
+```
+
+## Diploma Positioning
+
+The project can be described as an API-based security layer for machine learning pipelines. It detects suspicious samples using statistical, machine learning-based, and neighborhood consistency methods, evaluates attacks using quantitative metrics, and returns cleaned data for downstream model training.

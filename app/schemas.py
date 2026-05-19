@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -79,3 +79,22 @@ class LabelAnalyzeResponse(BaseModel):
     suspicious_count: int
     suspicious_indices: List[int]
     results: List[LabelAnalyzeItem]
+
+
+class DemoResponse(BaseModel):
+    dataset: str
+    scenario: str
+    rows_before_cleaning: int
+    rows_after_cleaning: int
+    metrics: Dict[str, float]
+    suspicious_indices_preview: List[int]
+
+
+class RealDatasetResult(BaseModel):
+    scenario: str
+    method: str
+    accuracy: float
+    precision: float
+    recall: float
+    f1_score: float
+    detected_samples: int
