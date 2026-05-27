@@ -1,13 +1,13 @@
-# AI Data Poisoning Detection System v2.1
+﻿# AI Data Poisoning Detection System v2.1
 
 FastAPI-based prototype for detecting data poisoning attacks before data is used in machine learning pipelines.
 
 ## Practical Improvements
 
-- Real-world validation with the Breast Cancer Wisconsin dataset.
+- Real-world validation with Breast Cancer Wisconsin, Wine, and Digits datasets.
 - Simple outlier, complex subtle poisoning, and label flipping attack simulation.
 - Improved complex subtle poisoning scenario using feature shift and correlation drift.
-- API v2.1 demo endpoints for end-to-end validation.
+- API v2.2 demo endpoints for end-to-end and multi-dataset validation.
 - Minimal deep learning poisoning experiment using the Scikit-learn Digits dataset and an MLP classifier.
 - Architecture diagram for the diploma text and presentation.
 
@@ -24,7 +24,8 @@ FastAPI-based prototype for detecting data poisoning attacks before data is used
 ## API Endpoints
 
 - `GET /health` - service status.
-- `GET /methods` - supported detection methods.
+- GET /methods - supported detection methods.
+- GET /datasets - supported built-in real-world datasets.
 - `POST /analyze` - multi-method numeric anomaly analysis.
 - `POST /clean` - removes suspicious samples and returns cleaned data.
 - `POST /analyze/labels` - label flipping detection with KNN consistency.
@@ -77,3 +78,4 @@ Data Sources -> Poisoning Simulation -> FastAPI Detection Service
 ## Diploma Positioning
 
 The project can be described as an API-based security layer for machine learning pipelines. It detects suspicious samples using statistical, machine learning-based, and neighborhood consistency methods, evaluates attacks using quantitative metrics, and returns cleaned data for downstream model training.
+

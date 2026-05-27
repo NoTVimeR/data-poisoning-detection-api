@@ -1,0 +1,14 @@
+\begin{table}[H]
+\centering
+\caption{Comparison of F1-score across attack scenarios and detection methods.}
+\label{tab:f1_method_comparison}
+\begin{tabular}{llllll}
+\hline
+Attack & Hybrid & Isolation Forest & KNN Label Consistency & Lof & Z Score \\
+\hline
+Complex Subtle & 0.0690 & 0.0488 & - & 0.0650 & 0.1269 \\
+Label Flipping & - & - & 0.8052 & - & - \\
+Simple Outlier & 0.7874 & 0.8929 & - & 0.0000 & 0.7874 \\
+\hline
+\end{tabular}
+\end{table}

@@ -15,13 +15,14 @@ from app.attacks import (
     inject_label_flipping,
     inject_simple_outliers,
     load_real_breast_cancer_dataset,
+    load_real_dataset_catalog,
 )
 from app.evaluation import evaluate_flags
 
 app = FastAPI(
     title="AI Data Poisoning Detection System v2",
     description="Multi-method API for detecting and preventing data poisoning attacks in ML pipelines",
-    version="2.1.0",
+    version="2.2.0",
 )
 
 detector = DetectorService()
@@ -33,6 +34,7 @@ def root():
         "message": "AI Data Poisoning Detection System v2 is running",
         "docs": "/docs",
         "end_to_end_demo": "/demo/end-to-end",
+        "datasets": "/datasets",
     }
 
 
@@ -68,6 +70,21 @@ def methods():
                 "name": "knn_label_consistency",
                 "purpose": "Detects label flipping by checking local label consistency"
             }
+        ]
+    }
+
+
+@app.get("/datasets", tags=["General"])
+def datasets():
+    return {
+        "datasets": [
+            {
+                "name": name,
+                "samples": int(x.shape[0]),
+                "features": int(x.shape[1]),
+                "classes": int(len(set(y.tolist()))),
+            }
+            for name, (x, y, _) in load_real_dataset_catalog().items()
         ]
     }
 
@@ -137,34 +154,37 @@ def demo_end_to_end():
 
 @app.get("/demo/real-dataset-results", tags=["Demo"])
 def demo_real_dataset_results():
-    x, y, _ = load_real_breast_cancer_dataset()
-    scenarios = [
-        inject_simple_outliers(x, count=50),
-        inject_complex_subtle_poisoning(x, count=60),
-        inject_label_flipping(x, y, flip_fraction=0.12),
-    ]
     rows = []
-    for scenario in scenarios:
-        if "Label" in scenario.description:
-            label_analysis = detector.analyze_labels(values=scenario.values, labels=scenario.labels)
-            predicted = [0] * len(scenario.values)
-            for index in label_analysis["suspicious_indices"]:
-                predicted[index] = 1
-            rows.append({
-                "scenario": scenario.description,
-                "method": "knn_label_consistency",
-                **evaluate_flags(scenario.poisoning_labels, predicted),
-                "detected_samples": len(label_analysis["suspicious_indices"]),
-            })
-            continue
+    for dataset_name, (x, y, _) in load_real_dataset_catalog().items():
+        poison_count = max(10, min(60, int(len(x) * 0.10)))
+        scenarios = [
+            inject_simple_outliers(x, count=poison_count),
+            inject_complex_subtle_poisoning(x, count=poison_count),
+            inject_label_flipping(x, y, flip_fraction=0.12),
+        ]
+        for scenario in scenarios:
+            if "Label" in scenario.description:
+                label_analysis = detector.analyze_labels(values=scenario.values, labels=scenario.labels)
+                predicted = [0] * len(scenario.values)
+                for index in label_analysis["suspicious_indices"]:
+                    predicted[index] = 1
+                rows.append({
+                    "dataset": dataset_name,
+                    "scenario": scenario.description,
+                    "method": "knn_label_consistency",
+                    **evaluate_flags(scenario.poisoning_labels, predicted),
+                    "detected_samples": len(label_analysis["suspicious_indices"]),
+                })
+                continue
 
-        for method in ["z_score", "isolation_forest", "lof", "hybrid"]:
-            analysis = detector.analyze_numeric(values=scenario.values, methods=[method], contamination=0.10)
-            predicted = [1 if item["final_flag"] else 0 for item in analysis["results"]]
-            rows.append({
-                "scenario": scenario.description,
-                "method": method,
-                **evaluate_flags(scenario.poisoning_labels, predicted),
-                "detected_samples": len(analysis["suspicious_indices"]),
-            })
-    return {"dataset": "Breast Cancer Wisconsin", "results": rows}
+            for method in ["z_score", "isolation_forest", "lof", "hybrid"]:
+                analysis = detector.analyze_numeric(values=scenario.values, methods=[method], contamination=0.10)
+                predicted = [1 if item["final_flag"] else 0 for item in analysis["results"]]
+                rows.append({
+                    "dataset": dataset_name,
+                    "scenario": scenario.description,
+                    "method": method,
+                    **evaluate_flags(scenario.poisoning_labels, predicted),
+                    "detected_samples": len(analysis["suspicious_indices"]),
+                })
+    return {"datasets": list(load_real_dataset_catalog().keys()), "results": rows}

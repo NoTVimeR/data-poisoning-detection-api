@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\caption{Detailed experimental results across attacks and methods.}
+\label{tab:full_experimental_results}
+\begin{tabular}{lllllll}
+\hline
+Attack & Method & Accuracy & Precision & Recall & F1-score & Detected \\
+\hline
+Simple Outlier & Z Score & 0.9564 & 0.6494 & 1.0000 & 0.7874 & 77 \\
+Simple Outlier & Isolation Forest & 0.9806 & 0.8065 & 1.0000 & 0.8929 & 62 \\
+Simple Outlier & Lof & 0.8191 & 0.0000 & 0.0000 & 0.0000 & 62 \\
+Simple Outlier & Hybrid & 0.9564 & 0.6494 & 1.0000 & 0.7874 & 77 \\
+Complex Subtle & Z Score & 0.6280 & 0.0817 & 0.2833 & 0.1269 & 208 \\
+Complex Subtle & Isolation Forest & 0.8140 & 0.0476 & 0.0500 & 0.0488 & 63 \\
+Complex Subtle & Lof & 0.8172 & 0.0635 & 0.0667 & 0.0650 & 63 \\
+Complex Subtle & Hybrid & 0.7854 & 0.0588 & 0.0833 & 0.0690 & 85 \\
+Label Flipping & KNN Label Consistency & 0.9473 & 0.7209 & 0.9118 & 0.8052 & 86 \\
+\hline
+\end{tabular}
+\end{table}

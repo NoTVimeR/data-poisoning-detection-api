@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
-from sklearn.datasets import load_breast_cancer, make_classification
+from sklearn.datasets import load_breast_cancer, load_digits, load_wine, make_classification
 from sklearn.preprocessing import StandardScaler
 
 
@@ -19,6 +19,25 @@ class DatasetBundle:
 def load_real_breast_cancer_dataset() -> Tuple[np.ndarray, np.ndarray, List[str]]:
     dataset = load_breast_cancer()
     return dataset.data.astype(float), dataset.target.astype(int), list(dataset.feature_names)
+
+
+def load_real_wine_dataset() -> Tuple[np.ndarray, np.ndarray, List[str]]:
+    dataset = load_wine()
+    return dataset.data.astype(float), dataset.target.astype(int), list(dataset.feature_names)
+
+
+def load_real_digits_dataset() -> Tuple[np.ndarray, np.ndarray, List[str]]:
+    dataset = load_digits()
+    feature_names = [f"pixel_{index}" for index in range(dataset.data.shape[1])]
+    return dataset.data.astype(float), dataset.target.astype(int), feature_names
+
+
+def load_real_dataset_catalog() -> Dict[str, Tuple[np.ndarray, np.ndarray, List[str]]]:
+    return {
+        "Breast Cancer Wisconsin": load_real_breast_cancer_dataset(),
+        "Wine": load_real_wine_dataset(),
+        "Digits": load_real_digits_dataset(),
+    }
 
 
 def make_synthetic_dataset(samples: int = 200, features: int = 6, random_state: int = 42) -> Tuple[np.ndarray, np.ndarray]:

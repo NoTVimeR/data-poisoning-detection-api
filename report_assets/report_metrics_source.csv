@@ -1,0 +1,10 @@
+Attack,Method,accuracy,precision,recall,f1_score,Detected
+Simple Outlier,Z Score,0.9564,0.6494,1.0,0.7874,77
+Simple Outlier,Isolation Forest,0.9806,0.8065,1.0,0.8929,62
+Simple Outlier,Lof,0.8191,0.0,0.0,0.0,62
+Simple Outlier,Hybrid,0.9564,0.6494,1.0,0.7874,77
+Complex Subtle,Z Score,0.628,0.0817,0.2833,0.1269,208
+Complex Subtle,Isolation Forest,0.814,0.0476,0.05,0.0488,63
+Complex Subtle,Lof,0.8172,0.0635,0.0667,0.065,63
+Complex Subtle,Hybrid,0.7854,0.0588,0.0833,0.069,85
+Label Flipping,KNN Label Consistency,0.9473,0.7209,0.9118,0.8052,86
